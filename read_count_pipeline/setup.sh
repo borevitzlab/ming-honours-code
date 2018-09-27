@@ -4,6 +4,7 @@
 if [ ! -d "working/" ]; then
   echo "[setup] Creating intermediate files folder ..."
   mkdir working/
+  mkdir working/samples_filtered
 fi
 
 # Before setup, place ref genomes in ref_genomes
@@ -27,4 +28,8 @@ fi
 # creates Kallisto ref as "kalindex<number of reference genomes>_ref"
 
 echo "[setup] Creating ditasic similarity matrix"
-ditasic_matrix.py -l 1000 -o output/similarity_matrix.npy working/reference_paths.txt --startprob 0.1 --avgprob 0.05 --endprob 0.1
+if [ ! -f kalindex* ]; then
+  ditasic_matrix.py -l 200 -o working/similarity_matrix.npy working/reference_paths.txt --startprob 0.1 --avgprob 0.05 --endprob 0.1
+else
+  ditasic_matrix.py -l 200 -o working/similarity_matrix.npy working/reference_paths.txt --startprob 0.1 --avgprob 0.05 --endprob 0.1 -i kalindex*
+fi

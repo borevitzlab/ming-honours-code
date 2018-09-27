@@ -1,26 +1,43 @@
-# runs from 1 to 12
-COUNTER=1
-while [ $COUNTER -lt 13 ]; do
-  echo Processing sample $COUNTER
-  serum_readfilter runfilter kraken -db data/kraken_db -R1 data/samples_unfiltered/${COUNTER}.fastq -R2 data/samples_unfiltered/${COUNTER}.fastq -t 4
-  rm -rf filtered_R2.fastq
-  mv filtered_R1.fastq data/samples_filtered/${COUNTER}.fastq
-  let COUNTER=COUNTER+1
-done
+#!/bin/bash
 
-# runs from 1 to 12
-COUNTER=1
-while [ $COUNTER -lt 13 ]; do
-  echo Processing sample $COUNTER
+if [ ! -d "working/samples_filtered/" ]; then
+  mkdir working/samples_filtered
+fi
+
+if [ ! -d "output/" ]; then
+  mkdir output
+fi
+
+TAB=$'\t'
+
+for sample in data/samples_unfiltered/*.fastq; do
+  sample_name=$(basename $sample .fastq)
+  echo "Processing $sample"
+  if [ -f "output/${sample_name}.tsv" ]; then
+    echo "$sample already processed"
+    continue
+  fi
+  # filter reads for each sample
+  serum_readfilter runfilter kraken -db working/kraken_db -R1 $sample -R2 $sample -t 4
+  rm filtered_R2.fastq
+  mv filtered_R1.fastq "working/samples_filtered/${sample_name}.fastq"
+
   # Map the samples to the reference files for the raw abundance values
-  ditasic_mapping.py -l 1000 -i kalindex_4ref data/reference_paths data/samples_filtered/${COUNTER}.fastq
+  ditasic_mapping.py -l 1000 -i kalindex_* working/reference_paths.txt "working/samples_filtered/${sample_name}.fastq"
+
   # Move values to output
-  mv ${COUNTER}_mapped_counts.npy ${COUNTER}_total.npy output
+  mv "${sample_name}_mapped_counts.npy" "${sample_name}_total.npy" working
+
   # Estimate abundance for sample
-  ditasic -r data/reference_paths -a output/similarity_matrix4.npy \
-                  -x output/${COUNTER}_mapped_counts.npy -n output/${COUNTER}_total.npy \
-                  -f F -t 750 -o output/${COUNTER}_abundance.txt
-  let COUNTER=COUNTER+1
+  ditasic -r working/reference_paths.txt -a working/similarity_matrix.npy \
+                  -x "working/${sample_name}_mapped_counts.npy" -n "working/${sample_name}_total.npy" \
+                  -f F -t 750 -o "output/${sample_name}.tsv"
+
+  # Add sample label to output .tsv
+  output="output/${sample_name}.tsv"
+  sed -i '' 's/$/'"${TAB}${sample_name}"'/' $output
+  sed -i '' '1d' $output
 done
 
-for sample in 
+echo $'taxa.name\tcount.estimate\terror.estimate\tfiltered\traw.pval\tsample' > temp/header.txt
+cat temp/header.txt output/*.tsv > output.tsv
