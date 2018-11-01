@@ -51,14 +51,23 @@ filtered <- data[data$sample_total>20,]
 
 # Format axis labels 
 library(limma)
+library(scales)
 filtered$sample <- paste(filtered$sample, " (", filtered$tray,", ",percent(filtered$filter_prop),  ") ", 
                          filtered$treatment_label, sep="")
 
 # Special axis labels
 filtered$sample[grep("^ref", filtered$sample)] <- paste("Original culture mix:", percent(filtered$filter_prop[grep("^ref", filtered$sample)]))
 filtered$sample[grep("^soil", filtered$sample)] <- paste("Soil slurry inoculum:", percent(filtered$filter_prop[grep("^soil", filtered$sample)]))
-filtered$sample[grep("^sim_combo1k", filtered$sample)] <- paste("1000 reads simulated equal mix:", percent(filtered$filter_prop[grep("^sim_combo1k", filtered$sample)]))
-filtered$sample[grep("^sim_combo10k", filtered$sample)] <- paste("10000 reads simulated equal mix:", percent(filtered$filter_prop[grep("^sim_combo10k", filtered$sample)]))
+filtered$sample[grep("^sim_combo100000", filtered$sample)] <- paste("100000 reads simulated equal mix:", percent(filtered$filter_prop[grep("^sim_combo100000", filtered$sample)]))
+filtered$sample[grep("^sim_combo10000", filtered$sample)] <- paste("10000 reads simulated equal mix:", percent(filtered$filter_prop[grep("^sim_combo10000", filtered$sample)]))
+filtered$sample[grep("^sim_combo1000", filtered$sample)] <- paste("1000 reads simulated equal mix:", percent(filtered$filter_prop[grep("^sim_combo1000", filtered$sample)]))
+filtered$sample[grep("^sim_combo100", filtered$sample)] <- paste("100 reads simulated equal mix:", percent(filtered$filter_prop[grep("^sim_combo100", filtered$sample)]))
+
+filtered$sample[grep("^bjaponicum_213_6", filtered$sample)] <- paste("10000 reads simulated from strain 213.6:", percent(filtered$filter_prop[grep("^bjaponicum_213_6", filtered$sample)]))
+filtered$sample[grep("^bjaponicum_36_8", filtered$sample)] <- paste("10000 reads simulated from strain 36.8:", percent(filtered$filter_prop[grep("^bjaponicum_36_8", filtered$sample)]))
+filtered$sample[grep("^bjaponicum_36_1", filtered$sample)] <- paste("10000 reads simulated from strain 36.1:", percent(filtered$filter_prop[grep("^bjaponicum_36_1", filtered$sample)]))
+filtered$sample[grep("^bjaponicum_65_7", filtered$sample)] <- paste("10000 reads simulated from strain 65.7:", percent(filtered$filter_prop[grep("^bjaponicum_65_7", filtered$sample)]))
+
 #filtered$sample <- paste(filtered$sample, " (", filtered$sample_total, ")", sep = "")
 
 # Create matrix for heatmap
