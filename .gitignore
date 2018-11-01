@@ -3,5 +3,11 @@ read_count_pipeline/data/
 read_count_pipeline/working/
 read_count_pipeline/temp/
 read_count_pipeline/kalindex_4ref
-read_count_pipeline/output/
+read_count_pipeline/*.tsv
+read_count_pipeline/*.pdf
+read_count_pipeline/*.jpg
+read_count_pipeline/*.svg
+read_count_pipeline/output*
+read_count_pipeline/.Rhistory
+read_count_pipeline/read_filter_counts.csv
 .ipynb_checkpoints/
